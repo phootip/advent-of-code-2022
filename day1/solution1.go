@@ -1,28 +1,14 @@
-// package quest1
-package main
+package day1
+
+// package main
 
 import (
 	"fmt"
-	"os"
 	"sort"
 	"strconv"
-	"strings"
+
+	"github.com/phootip/advent-of-code-2022/utils"
 )
-
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
-
-func readFile(filename string) []string {
-	b, err := os.ReadFile(filename)
-	s := string(b)
-	check(err)
-	data := strings.Split(s, "\n")
-	return data
-
-}
 
 func getMax(data []int) int {
 	result := 0
@@ -35,15 +21,15 @@ func getMax(data []int) int {
 }
 
 func Sol1() int {
-	fmt.Println("Starting sol1...")
-	// raw := readFile("./example1.txt")
-	raw := readFile("./input.txt")
+	fmt.Println("Starting Day1 Solution1...")
+	// raw := utils.ReadFile("./day1/example1.txt")
+	raw := utils.ReadFile("./day1/input.txt")
 	mem := []int{0}
 	// count := 0
 	for _, line := range raw {
 		if line != "" {
 			value, err := strconv.Atoi(line)
-			check(err)
+			utils.Check(err)
 			mem[len(mem)-1] += value
 		} else {
 			mem = append(mem, 0)
@@ -54,15 +40,15 @@ func Sol1() int {
 }
 
 func Sol2() int {
-	fmt.Println("Starting sol2...")
-	// raw := readFile("./example1.txt")
-	raw := readFile("./input.txt")
+	fmt.Println("Starting Day1 Solution2...")
+	// raw := utils.ReadFile("./day1/example1.txt")
+	raw := utils.ReadFile("./day1/input.txt")
 	mem := []int{0}
 	// count := 0
 	for _, line := range raw {
 		if line != "" {
 			value, err := strconv.Atoi(line)
-			check(err)
+			utils.Check(err)
 			mem[len(mem)-1] += value
 		} else {
 			mem = append(mem, 0)
