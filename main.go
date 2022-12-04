@@ -6,6 +6,7 @@ import (
 
 	"github.com/phootip/advent-of-code-2022/day1"
 	"github.com/phootip/advent-of-code-2022/day2"
+	"github.com/phootip/advent-of-code-2022/day3"
 )
 
 func main() {
@@ -20,5 +21,8 @@ func main() {
 	case "2":
 		fmt.Println(day2.Sol1())
 		fmt.Println(day2.Sol2())
+	case "3":
+		// fmt.Println("answer: ", day3.Sol1())
+		fmt.Println("answer: ", day3.Sol2())
 	}
 }
