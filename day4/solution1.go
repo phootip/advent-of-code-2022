@@ -11,7 +11,7 @@ import (
 // 501 too high
 
 func Sol1() int {
-	fmt.Println("Starting Day3 Solution1...")
+	fmt.Println("Starting Day4 Solution1...")
 	raw := utils.ReadFile("./day4/input.txt")
 	// raw := utils.ReadFile("./day4/example1.txt")
 	ans := 0
@@ -25,7 +25,7 @@ func Sol1() int {
 		elf1 := SToInt(strings.Split(elfs[0], "-"))
 		elf2 := SToInt(strings.Split(elfs[1], "-"))
 		// fmt.Println(elf1, elf2)
-		if inRangeOf(elf1, elf2) || inRangeOf(elf2,elf1) {
+		if inRangeOf(elf1, elf2) || inRangeOf(elf2, elf1) {
 			// fmt.Println(elf1, elf2)
 			ans += 1
 		}
@@ -34,7 +34,7 @@ func Sol1() int {
 }
 
 func Sol2() int {
-	fmt.Println("Starting Day3 Solution1...")
+	fmt.Println("Starting Day4 Solution2...")
 	raw := utils.ReadFile("./day4/input.txt")
 	// raw := utils.ReadFile("./day4/example1.txt")
 	ans := 0
@@ -57,7 +57,7 @@ func Sol2() int {
 }
 
 func inRangeOf(elf1 []int, elf2 []int) bool {
-	return elf1[0] >= elf2[0] && elf1[1] <= elf2[1] 
+	return elf1[0] >= elf2[0] && elf1[1] <= elf2[1]
 }
 
 func overlap(elf1 []int, elf2 []int) bool {
@@ -65,21 +65,21 @@ func overlap(elf1 []int, elf2 []int) bool {
 }
 
 func Map[T, V any](ts []T, fn func(T) V) []V {
-    result := make([]V, len(ts))
-    for i, t := range ts {
-        result[i] = fn(t)
-    }
-    return result
+	result := make([]V, len(ts))
+	for i, t := range ts {
+		result[i] = fn(t)
+	}
+	return result
 }
 
 func SToInt(ss []string) []int {
-			result := make([]int, len(ss))
-		for i, s := range ss {
-			r, err := strconv.Atoi(s)
-			utils.Check(err)
-			result[i] = r
-		}
-		return result
+	result := make([]int, len(ss))
+	for i, s := range ss {
+		r, err := strconv.Atoi(s)
+		utils.Check(err)
+		result[i] = r
+	}
+	return result
 }
 
 // func Sol2() int {
