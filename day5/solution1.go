@@ -16,7 +16,7 @@ func Sol1() string {
 	fmt.Println(crates)
 	fmt.Println(insts)
 	for _, inst := range insts {
-		crates = moveN(crates, inst)
+		crates = move1N(crates, inst)
 		fmt.Println(inst)
 		fmt.Println(crates)
 	}
@@ -28,7 +28,7 @@ func Sol1() string {
 	return ans
 }
 
-func moveN(crates [10]string, inst []int) [10]string {
+func move1N(crates [10]string, inst []int) [10]string {
 	for i := 0; i < inst[0]; i++ {
 		crates = move(crates, inst[1], inst[2])
 	}
@@ -64,7 +64,7 @@ func parseRaw(raw []string) ([10]string, [][]int) {
 			}
 		} else {
 			// parse inst
-			fmt.Println("Parsing Inst...")
+			// fmt.Println("Parsing Inst...")
 			if line == "" {
 				break
 			}
