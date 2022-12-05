@@ -2,6 +2,7 @@ package day5
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/phootip/advent-of-code-2022/utils"
 )
@@ -17,30 +18,48 @@ func Sol1() string {
 	return ans
 }
 
-func parseRaw(raw []string) ([10]string, []int) {
+func parseRaw(raw []string) ([10]string, [][]int) {
 	crates := [10]string{}
-	inst := []int{}
+	insts := [][]int{}
+	parseCrates := true
 	for _, line := range raw {
-		if line == "" {
-			break
-		}
 		fmt.Println(line)
 		// parse crates
-		for i, r := range line {
-			// break if 1 2 3 line
-			if r == 49 {
-				break
-			}
-			if i%4 == 1 {
-				// fmt.Println(i, i/4, string(r), r)
-				if r != 32 {
-					crates[(i/4)+1] += string(r)
+		if parseCrates {
+			for i, r := range line {
+				// break if 1 2 3 line
+				if r == 49 {
+					break
+				}
+				if i%4 == 1 {
+					// fmt.Println(i, i/4, string(r), r)
+					if r != 32 {
+						crates[(i/4)+1] = string(r) + crates[(i/4)+1]
+					}
 				}
 			}
+		} else {
+		// parse inst
+			fmt.Println("Parsing Inst...")
+			if line == "" {
+				break
+			}
+			insts = append(insts, parseInst(line))
+		}
+		if line == "" {
+			parseCrates = false
 		}
 	}
-	fmt.Println(crates[1])
-	fmt.Println(crates[2])
-	fmt.Println(crates[3])
-	return crates, inst
+	return crates, insts
+}
+
+func parseInst(line string) []int {
+	splited := strings.Split(line, " ")
+	filtered := []string{}
+	for i, s := range splited {
+		if i%2 == 1 {
+			filtered = append(filtered, s)
+		}
+	}
+	return utils.SToInt(filtered)
 }
