@@ -8,6 +8,7 @@ import (
 	"github.com/phootip/advent-of-code-2022/day2"
 	"github.com/phootip/advent-of-code-2022/day3"
 	"github.com/phootip/advent-of-code-2022/day4"
+	"github.com/phootip/advent-of-code-2022/draw"
 )
 
 func main() {
@@ -16,6 +17,8 @@ func main() {
 		return
 	}
 	switch os.Args[1] {
+	case "draw":
+		draw.Draw()
 	case "1":
 		fmt.Println(day1.Sol1())
 		fmt.Println(day1.Sol2())
