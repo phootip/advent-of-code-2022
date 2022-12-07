@@ -13,7 +13,7 @@ func Sol1() int {
 	raw := utils.ReadFile("./day7/input.txt")
 	// raw := utils.ReadFile("./day7/example.txt")
 	dirMap := genDir(raw)
-	fmt.Println(dirMap)
+	// fmt.Println(dirMap)
 
 	fmt.Println("Calculating each dir size...")
 	// calTotalSizeLoop(dirMap)
@@ -21,10 +21,44 @@ func Sol1() int {
 	return calAns(dirMap)
 	// return 0
 }
+
+func Sol2() int {
+	fmt.Println("Starting Day7 Solution2...")
+	raw := utils.ReadFile("./day7/input.txt")
+	// raw := utils.ReadFile("./day7/example.txt")
+	dirMap := genDir(raw)
+	// fmt.Println(dirMap)
+
+	fmt.Println("Calculating each dir size...")
+	// calTotalSizeLoop(dirMap)
+	calTotalSize(dirMap, "/")
+	return calAns2(dirMap)
+}
+
+func calAns2(dirMap map[string]any) int {
+	unused := 70000000 - dirMap["/"].(map[string]any)["totalSize"].(int)
+	needed := 30000000 - unused
+	fmt.Println(unused)
+	fmt.Println(needed)
+	ans := 70000000
+	for k := range dirMap {
+		totalSize := dirMap[k].(map[string]any)["totalSize"].(int)
+		if totalSize > needed {
+			ans = min(ans,totalSize)
+		}
+	}
+	return ans
+}
+func min(a, b int) int {
+    if a < b {
+        return a
+    }
+    return b
+}
 func calAns(dirMap map[string]any) int {
 	ans := 0
-	for k, v := range dirMap {
-		fmt.Println(k, v.(map[string]any)["totalSize"])
+	for _, v := range dirMap {
+		// fmt.Println(k, v.(map[string]any)["totalSize"])
 		size := v.(map[string]any)["totalSize"].(int)
 		if size <= 100000 {
 			ans += size
