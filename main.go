@@ -50,6 +50,6 @@ func main() {
 		fmt.Println("answer: ", day8.Sol2())
 	case "9":
 		fmt.Println("answer: ", day9.Sol1())
-		// fmt.Println("answer: ", day9.Sol2())
+		fmt.Println("answer: ", day9.Sol2())
 	}
 }
