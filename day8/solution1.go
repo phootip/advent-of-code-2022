@@ -13,7 +13,7 @@ func Sol1() int {
 	raw := utils.ReadFile("./day8/input.txt")
 	// raw := utils.ReadFile("./day8/example.txt")
 	treeMap := genMap(raw)
-	fmt.Println(treeMap)
+	// fmt.Println(treeMap)
 	return countVisible(treeMap)
 }
 
