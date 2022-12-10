@@ -20,6 +20,56 @@ func Sol1() int {
 	return com.ans
 }
 
+func Sol2() string {
+	fmt.Println("Starting Day10 Solution2...")
+	raw := utils.ReadFile("./day10/input.txt")
+	// raw := utils.ReadFile("./day10/example.txt")
+	insts := rawToInst(raw)
+	com := cpu{x: 1, cycle: 0, counter: 0, insts: insts, terminated: false, ans: 0}
+	ans := ""
+	for !com.terminated {
+		ans += com.draw()
+		com.compute2()
+		// if com.terminated || com.cycle == 3 {
+		if com.terminated {
+			return ans
+		}
+		if com.cycle%40 == 0 && com.cycle <= 240 {
+			ans += "\n"
+		}
+	}
+	return ans
+}
+
+func (com *cpu) draw() string {
+	if com.x-1 <= com.cycle%40 && com.cycle%40 <= com.x+1 {
+		return "#"
+	}
+	return "."
+
+}
+
+func (com *cpu) compute2() {
+	if com.counter >= len(com.insts) {
+		com.terminated = true
+		return
+	}
+	com.cycle++
+	// fmt.Println("cycles: ", com.cycle)
+	if com.loaded {
+		com.x += com.insts[com.counter].arg
+		com.loaded = false
+		com.counter++
+		return
+	}
+	switch com.insts[com.counter].op {
+	case "addx":
+		com.loaded = true
+		return
+	}
+	com.counter++
+}
+
 func (com *cpu) compute() {
 	if com.counter >= len(com.insts) {
 		com.terminated = true
