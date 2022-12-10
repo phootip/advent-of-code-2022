@@ -8,7 +8,7 @@ import (
 	"github.com/phootip/advent-of-code-2022/utils"
 )
 
-// 2225 too high
+// 2225 too high =>
 func Sol1() int {
 	fmt.Println("Starting Day9 Solution1...")
 	raw := utils.ReadFile("./day9/input.txt")

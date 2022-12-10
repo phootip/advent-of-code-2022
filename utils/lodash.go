@@ -11,6 +11,15 @@ func Contains[T int | rune](s []T, e T) bool {
 	return false
 }
 
+func ContainsInt(s []int, e int) bool {
+	for _, a := range s {
+			if a == e {
+					return true
+			}
+	}
+	return false
+}
+
 func ReverseS(s string) (result string) {
 	for _, r := range s {
 		result = string(r) + result
