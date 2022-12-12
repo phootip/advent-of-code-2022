@@ -36,3 +36,9 @@ func SToInt(ss []string) []int {
 	}
 	return result
 }
+
+func StringToInt(s string) int {
+	i, err := strconv.Atoi(s)
+	Check(err)
+	return i
+}

@@ -6,6 +6,7 @@ import (
 
 	"github.com/phootip/advent-of-code-2022/day1"
 	"github.com/phootip/advent-of-code-2022/day10"
+	"github.com/phootip/advent-of-code-2022/day11"
 	"github.com/phootip/advent-of-code-2022/day2"
 	"github.com/phootip/advent-of-code-2022/day3"
 	"github.com/phootip/advent-of-code-2022/day4"
@@ -55,5 +56,8 @@ func main() {
 	case "10":
 		fmt.Println("answer: ", day10.Sol1())
 		fmt.Print("answer:\n", day10.Sol2())
+	case "11":
+		fmt.Println("answer: ", day11.Sol1())
+		// fmt.Println("answer:", day11.Sol2())
 	}
 }
