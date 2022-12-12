@@ -38,10 +38,6 @@ func compute(monkeys []monkey) {
 
 func (m *monkey) inspect(monkeys []monkey) {
 	var item int
-	// for i, item := range m.items {
-	// 	m.ans += 1
-	// 	m.items[i] = m.op(item)
-	// }
 	for len(m.items) > 0 {
 		m.ans++
 		item, m.items = m.items[0], m.items[1:len(m.items)]
