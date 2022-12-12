@@ -17,6 +17,10 @@ func Sol1() int {
 	for i := 0; i < 20; i++ {
 		compute(monkeys)
 	}
+	return getAns(monkeys)
+}
+
+func getAns(monkeys []monkey) int {
 	result := []int{}
 	for _, m := range monkeys {
 		result = append(result, m.ans)
@@ -30,8 +34,6 @@ func compute(monkeys []monkey) {
 		m := &monkeys[i]
 		m.inspect(monkeys)
 	}
-	fmt.Println("After loop1------")
-	fmt.Println(monkeys)
 }
 
 func (m *monkey) inspect(monkeys []monkey) {
