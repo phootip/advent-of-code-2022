@@ -18,7 +18,6 @@ func Sol1() int {
 func bfs(pointMap [][]rune, start path, end path) int {
 	queue := []path{start}
 	visited := map[path]bool{start: true}
-	_, _ = queue, visited
 	// fmt.Println(pointMap)
 	fmt.Println("start, end: ",start, end)
 
