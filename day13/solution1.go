@@ -24,21 +24,20 @@ func Sol1() int {
 }
 
 func compare(a, b any) int {
-	a = ifIntToSlice(a)
-	b = ifIntToSlice(b)
-	// fmt.Println(a,"---", b)
-	for i := range a.([]any) {
+	c := ifIntToSlice(a).([]any)
+	d := ifIntToSlice(b).([]any)
+	// fmt.Println(c,"---", b)
+	for i := range c {
 		// fmt.Println("i: ", i)
-		// fmt.Println(a.([]any)[i])
-		// fmt.Println(b.([]any)[i])
-		if i > len(b.([]any))-1 {
+		// fmt.Println(c[i])
+		// fmt.Println(b[i])
+		if i > len(d)-1 {
 			return -1
 		}
-		cInt, cIsInt := a.([]any)[i].(int)
-		dInt, dIsInt := b.([]any)[i].(int)
-		// fmt.Println(cInt, dInt)
+		cInt, cIsInt := c[i].(int)
+		dInt, dIsInt := d[i].(int)
 		if !(cIsInt && dIsInt) {
-			subResult := compare(a.([]any)[i], b.([]any)[i])
+			subResult := compare(c[i], d[i])
 			// fmt.Println("subResult: ", subResult)
 			if subResult != 0 {
 				return subResult
@@ -52,7 +51,7 @@ func compare(a, b any) int {
 			}
 		}
 	}
-	if len(a.([]any)) < len(b.([]any)) {
+	if len(c) < len(d) {
 		return 1
 	}
 	return 0
