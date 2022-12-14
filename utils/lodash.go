@@ -2,6 +2,13 @@ package utils
 
 import "strconv"
 
+func Max(a int, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
 func Contains[T int | rune](s []T, e T) bool {
 	for _, a := range s {
 		if a == e {
