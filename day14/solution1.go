@@ -36,7 +36,7 @@ func rawToRockMap(raw []string) map[int]map[int]int {
 
 func debug(rockMap map[int]map[int]int) {
 	for y := 0; y < 200; y++ {
-		for x := 450; x < 600; x++ {
+		for x := 350; x < 600; x++ {
 			fmt.Print(rockMap[y][x])
 		}
 		fmt.Println(" : ", y)
