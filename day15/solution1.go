@@ -23,7 +23,6 @@ func Sol1() int {
 	points := genPointsAtY(map1, yGoal)
 	// ans := answer(points)
 	ans := answer2(points)
-	pp.Println("answer:  4353354 too low")
 	return ans
 }
 
