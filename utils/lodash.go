@@ -33,6 +33,11 @@ func Contains[T int | rune | string](s []T, e T) bool {
 	return false
 }
 
+// func sliceToSet[T string | int](s []T) (result map[T]bool) {
+// 	for 
+	
+// }
+
 func Filter[T int | rune | string](s []T, e T) []T {
 	s2 := make([]T, len(s))
 	copy(s2, s)
@@ -42,6 +47,16 @@ func Filter[T int | rune | string](s []T, e T) []T {
 		}
 	}
 	return s2
+}
+
+func Difference(slice1 []string, slice2 []string) []string{
+	result := make([]string,0)
+	for _,s := range slice1 {
+		if !Contains(slice2, s) {
+			result = append(result, s)
+		}
+	}
+	return result
 }
 
 func ContainsInt(s []int, e int) bool {
