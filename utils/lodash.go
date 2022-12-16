@@ -24,13 +24,24 @@ func Min(a int, b int) int {
 	return b
 }
 
-func Contains[T int | rune](s []T, e T) bool {
+func Contains[T int | rune | string](s []T, e T) bool {
 	for _, a := range s {
 		if a == e {
 			return true
 		}
 	}
 	return false
+}
+
+func Filter[T int | rune | string](s []T, e T) []T {
+	s2 := make([]T, len(s))
+	copy(s2, s)
+	for i, a := range s {
+		if a == e {
+			return append(s2[:i],s2[i+1:]...)
+		}
+	}
+	return s2
 }
 
 func ContainsInt(s []int, e int) bool {
