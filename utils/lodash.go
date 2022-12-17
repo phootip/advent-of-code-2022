@@ -90,3 +90,15 @@ func StringToInt(s string) int {
 	Check(err)
 	return i
 }
+
+func SliceEqual[T [2]int](slice1 []T, slice2 []T) bool {
+	if len(slice1) != len(slice2) {
+		return false
+	}
+	for i := range slice1 {
+		if slice1[i][0] != slice2[i][0] || slice1[i][1] != slice2[i][1] {
+			return false
+		}
+	}
+	return true
+}

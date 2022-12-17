@@ -12,8 +12,6 @@ var dc *gg.Context
 
 func Sol1() (ans int) {
 	dc = gg.NewContext(100, 100_000)
-	// dc = gg.NewContext(10_000,10_000)
-	// dc = gg.NewContext(1000, 1000)
 	fmt.Println("Starting Day17 Solution1...")
 	raw := utils.ReadFile("./day17/input.txt")
 	// raw := utils.ReadFile("./day17/example.txt")
@@ -53,7 +51,7 @@ func (g *game) start() int {
 			// fmt.Println(g.countLoop)
 		}
 		if g.countRock == 2022 {
-			return 9999-g.height
+			return 9999 - g.height
 		}
 	}
 	panic("out of game loop")
@@ -71,7 +69,7 @@ func (g *game) controlRock() {
 
 func (g *game) canMoveRight() bool {
 	r := g.rock1
-	x,y := r.position[0], r.position[1]
+	x, y := r.position[0], r.position[1]
 	for j := 0; j < 4; j++ {
 		for i := 0; i < 4; i++ {
 			if r.body[j][i] == 1 && (i+x+1 >= 7 || g.stage[j+y][i+x+1] != 0) {
@@ -83,7 +81,7 @@ func (g *game) canMoveRight() bool {
 }
 func (g *game) canMoveLeft() bool {
 	r := g.rock1
-	x,y := r.position[0], r.position[1]
+	x, y := r.position[0], r.position[1]
 	for j := 0; j < 4; j++ {
 		for i := 0; i < 4; i++ {
 			if r.body[j][i] == 1 && (i+x-1 < 0 || g.stage[j+y][i+x-1] != 0) {
@@ -126,7 +124,6 @@ func (g *game) terminateRock() {
 	}
 	g.hasRock = false
 	g.countRock++
-	g.height = utils.Min(g.height,r.position[1]+(4-r.height))
 }
 
 func (g *game) moveDown() {
@@ -174,31 +171,31 @@ func (spawner *rockSpawner) initRock() {
 		{0, 0, 0, 0},
 		{0, 0, 0, 0},
 		{1, 1, 1, 1},
-	}, height: 1}
+	}, height: 1, id: 0}
 	rock1 := rock{body: [4][4]int{
 		{0, 0, 0, 0},
 		{0, 1, 0, 0},
 		{1, 1, 1, 0},
 		{0, 1, 0, 0},
-	}, height: 3}
+	}, height: 3, id: 1}
 	rock2 := rock{body: [4][4]int{
 		{0, 0, 0, 0},
 		{0, 0, 1, 0},
 		{0, 0, 1, 0},
 		{1, 1, 1, 0},
-	}, height: 3}
+	}, height: 3, id: 2}
 	rock3 := rock{body: [4][4]int{
 		{1, 0, 0, 0},
 		{1, 0, 0, 0},
 		{1, 0, 0, 0},
 		{1, 0, 0, 0},
-	}, height: 4}
+	}, height: 4, id: 3}
 	rock4 := rock{body: [4][4]int{
 		{0, 0, 0, 0},
 		{0, 0, 0, 0},
 		{1, 1, 0, 0},
 		{1, 1, 0, 0},
-	}, height: 2}
+	}, height: 2, id: 4}
 	spawner.rocks[0] = rock0
 	spawner.rocks[1] = rock1
 	spawner.rocks[2] = rock2
@@ -229,6 +226,7 @@ type rock struct {
 	body     [4][4]int
 	height   int
 	position [2]int
+	id       int
 }
 
 type controller struct {
