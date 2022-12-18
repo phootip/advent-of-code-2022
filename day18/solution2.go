@@ -7,13 +7,14 @@ import (
 )
 
 // 4266 too high
+// 2024 too low
 func Sol2() (ans int) {
 	fmt.Println("Starting Day18 Solution2...")
-	// raw := utils.ReadFile("./day18/input.txt")
-	raw := utils.ReadFile("./day18/example.txt")
+	raw := utils.ReadFile("./day18/input.txt")
+	// raw := utils.ReadFile("./day18/example.txt")
 	raw = raw[:len(raw)-1]
 	coords := rawToCoords(raw)
-	ans = countSides3(coords)
+	ans = countSides2(coords)
 	return ans
 }
 
@@ -27,8 +28,8 @@ func countSides3(coords [][3]int) (ans int) {
 }
 
 func steamSurface(coords [][3]int, minCoor [3]int, maxCoor [3]int) (ans int) {
-	for _, axises := range [][3]int{{0,1,2}, {0,2,1}, {1,2,0}} {
-		i,j,k := axises[0],axises[1],axises[2]
+	for _, axises := range [][3]int{{0, 1, 2}, {0, 2, 1}, {1, 2, 0}} {
+		i, j, k := axises[0], axises[1], axises[2]
 		for x := minCoor[i]; x <= maxCoor[i]; x++ {
 			for y := minCoor[j]; y <= maxCoor[j]; y++ {
 				for z := minCoor[k]; z <= maxCoor[k]; z++ {
@@ -64,34 +65,46 @@ func getMinMaxCoor(coords [][3]int) ([3]int, [3]int) {
 func countSides2(coords [][3]int) (ans int) {
 	minZ, maxZ := getMinMaxZ(coords)
 	grouped := groupCoordsByZ(coords, minZ, maxZ)
+	minLimit, maxLimit := getMinMaxCoor(coords)
+	for i := range [3]int{} {
+		minLimit[i]--
+		maxLimit[i]++
+	}
 	// fmt.Println(coords)
 	// fmt.Println(grouped)
 	start := grouped[minZ][0]
-	ans = bfs(start, coords)
+	start[2]--
+	ans = bfs(start, coords, minLimit, maxLimit)
 	return ans
 }
 
-func bfs(root [3]int, coords [][3]int) int {
+func bfs(root [3]int, coords [][3]int, minLimit [3]int, maxLimit [3]int) int {
+	// fmt.Println("root:", root)
+	// fmt.Println("limit:", minLimit,maxLimit)
 	var node [3]int
 	queue := [][3]int{root}
 	visited := map[[3]int]bool{}
 	visited[root] = true
-	ans := 6
+	ans := 0
 
 	for len(queue) > 0 {
 		node, queue = queue[0], queue[1:]
-		adjNodes := getAdjCoords(node)
-		fmt.Println("node: ", node)
-		fmt.Println(adjNodes)
+		adjNodes := getAdjCoords(node, minLimit, maxLimit)
+		// fmt.Println("node: ", node)
+		// fmt.Println(adjNodes)
 
+		// check surface
 		for _, adjNode := range adjNodes {
-			if !coordExist(adjNode, coords) || visited[adjNode] {
+			if coordExist(adjNode, coords){
+				ans += 1
 				continue
 			}
-			fmt.Println("visiting node: ", adjNode)
+			if visited[adjNode] {
+				continue
+			}
+			// fmt.Println("visiting node: ", adjNode)
 			queue = append(queue, adjNode)
 			visited[adjNode] = true
-			ans += 6
 		}
 	}
 	return ans
@@ -100,20 +113,17 @@ func bfs(root [3]int, coords [][3]int) int {
 
 }
 
-func getAdjCoords(node [3]int) (adjCoords [][3]int) {
-	temp := node
-	temp[2]--
-	adjCoords = append(adjCoords, temp)
-	for _, axis := range [3]int{0, 1} {
+func getAdjCoords(node [3]int, minLimit [3]int, maxLimit [3]int) (adjCoords [][3]int) {
+	for _, axis := range [3]int{0, 1, 2} {
 		for _, dir := range [2]int{-1, 1} {
-			temp = node
+			temp := node
 			temp[axis] += dir
+			if temp[axis] < minLimit[axis] || temp[axis] > maxLimit[axis]{
+				continue
+			}
 			adjCoords = append(adjCoords, temp)
 		}
 	}
-	temp = node
-	temp[2]++
-	adjCoords = append(adjCoords, temp)
 	return adjCoords
 }
 
