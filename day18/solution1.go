@@ -13,9 +13,6 @@ func Sol1() (ans int) {
 	// raw := utils.ReadFile("./day18/example.txt")
 	raw = raw[:len(raw)-1]
 	coords := rawToCoords(raw)
-	for _, coord := range coords {
-		fmt.Println(coord)
-	}
 	ans = countSides(coords)
 	return ans
 }
@@ -24,7 +21,6 @@ func Sol1() (ans int) {
 func rawToCoords(raw []string) (coords [][3]int) {
 	for _, line := range raw {
 		coor := utils.SToInt(strings.Split(line, ","))
-		// coords = append(coords, Coordinate{coor[0], coor[1], coor[2], 6})
 		arr := [3]int{}
 		copy(arr[:], coor)
 		coords = append(coords, arr)
@@ -33,7 +29,6 @@ func rawToCoords(raw []string) (coords [][3]int) {
 }
 
 func countSides(coords [][3]int) (ans int) {
-	// mem := [][3]int{}
 	for i, coor := range coords {
 		ans += 6
 		for _, coor2 := range coords[:i] {
@@ -45,27 +40,20 @@ func countSides(coords [][3]int) (ans int) {
 	return ans
 }
 
-func adjacent(coor1 [3]int, coor2 [3]int) bool {
-	// fmt.Println("Check adj: ", coor1, coor2)
+func adjacent(coord1 [3]int, coord2 [3]int) bool {
+	// fmt.Println("Check adj: ", coord1, coord2)
 	// at least2 side equal
 	equalSide := 0
 	nonEqualIdx := -1
-	for i := range coor1 {
-		if coor1[i] == coor2[i] {
+	for i := range coord1 {
+		if coord1[i] == coord2[i] {
 			equalSide++
 		} else {
 			nonEqualIdx = i
 		}
 	}
-	if equalSide == 2 && utils.Abs(coor1[nonEqualIdx] - coor2[nonEqualIdx]) == 1 {
+	if equalSide == 2 && utils.Abs(coord1[nonEqualIdx]-coord2[nonEqualIdx]) == 1 {
 		return true
 	}
 	return false
-}
-
-type Coordinate struct {
-	x int
-	y int
-	z int
-	surface int
 }
