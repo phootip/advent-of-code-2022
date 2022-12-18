@@ -13,8 +13,52 @@ func Sol2() (ans int) {
 	raw := utils.ReadFile("./day18/example.txt")
 	raw = raw[:len(raw)-1]
 	coords := rawToCoords(raw)
-	ans = countSides2(coords)
+	ans = countSides3(coords)
 	return ans
+}
+
+func countSides3(coords [][3]int) (ans int) {
+	minCoor, maxCoor := getMinMaxCoor(coords)
+	fmt.Println(minCoor, maxCoor)
+
+	ans += steamSurface(coords, minCoor, maxCoor)
+
+	return ans
+}
+
+func steamSurface(coords [][3]int, minCoor [3]int, maxCoor [3]int) (ans int) {
+	for _, axises := range [][3]int{{0,1,2}, {0,2,1}, {1,2,0}} {
+		i,j,k := axises[0],axises[1],axises[2]
+		for x := minCoor[i]; x <= maxCoor[i]; x++ {
+			for y := minCoor[j]; y <= maxCoor[j]; y++ {
+				for z := minCoor[k]; z <= maxCoor[k]; z++ {
+					temp := [3]int{}
+					temp[i] = x
+					temp[j] = y
+					temp[k] = z
+					if coordExist(temp, coords) {
+						fmt.Println(temp)
+						ans += 2
+						break
+					}
+				}
+			}
+		}
+	}
+
+	return ans
+}
+
+func getMinMaxCoor(coords [][3]int) ([3]int, [3]int) {
+	minCoor := [3]int{1000, 1000, 1000}
+	maxCoor := [3]int{0, 0, 0}
+	for _, coord := range coords {
+		for i := range [3]int{} {
+			minCoor[i] = utils.Min(minCoor[i], coord[i])
+			maxCoor[i] = utils.Max(maxCoor[i], coord[i])
+		}
+	}
+	return minCoor, maxCoor
 }
 
 func countSides2(coords [][3]int) (ans int) {
@@ -27,7 +71,7 @@ func countSides2(coords [][3]int) (ans int) {
 	return ans
 }
 
-func bfs(root [3]int, coords [][3]int) int{
+func bfs(root [3]int, coords [][3]int) int {
 	var node [3]int
 	queue := [][3]int{root}
 	visited := map[[3]int]bool{}
@@ -40,7 +84,7 @@ func bfs(root [3]int, coords [][3]int) int{
 		fmt.Println("node: ", node)
 		fmt.Println(adjNodes)
 
-		for _, adjNode := range adjNodes{
+		for _, adjNode := range adjNodes {
 			if !coordExist(adjNode, coords) || visited[adjNode] {
 				continue
 			}
