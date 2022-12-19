@@ -102,3 +102,10 @@ func SliceEqual[T [2]int](slice1 []T, slice2 []T) bool {
 	}
 	return true
 }
+
+func CopyMap[T map[string]int](map1 T, map2 T) T{
+	for k,v := range map2 {
+		map1[k] = v
+	}
+	return map1
+}
