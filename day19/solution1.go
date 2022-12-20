@@ -45,8 +45,8 @@ func process(blueprint *Blueprint, time int, target string, path []string) int {
 		fmt.Println("geode: ", blueprint.resource["geode"])
 		return blueprint.resource["geode"]
 	}
-	// fmt.Println("time: ", time)
-	// fmt.Println("target: ", target)
+	fmt.Println("time: ", time)
+	fmt.Println("target: ", target)
 	// fmt.Println("path: ", path)
 	// if time == 24 {
 	// 	panic("debug")
@@ -55,26 +55,30 @@ func process(blueprint *Blueprint, time int, target string, path []string) int {
 	result := 0
 	robot := blueprint.robots[target]
 	fmt.Println(robot)
-	waitTime := robot.timeTillBuildable(blueprint)
-	if waitTime > 24-time {
-		result = blueprint.resource["geode"]
-		fmt.Println("path: ", path)
-		fmt.Println("result: ", result)
-		if result > 9 {
-			panic("debug")
-		}
-		return blueprint.resource["geode"]
+	if robot.buildable(blueprint.resource) {
+		blueprint.build(target)
+		path = append(path, target)
+		target = ""
 	}
-	// newBlueprint := copyBlueprint(blueprint)
-	blueprint.updateResource(waitTime)
-	blueprint.build(target)
 	blueprint.updateResource(1)
-	path = append(path, target)
-	fmt.Println("endtime: ", time+waitTime)
-	// blueprint.debugResource()
-	for _, t := range allType {
-		newBlueprint := copyBlueprint(blueprint)
-		result = utils.Max(result, process(newBlueprint, time+waitTime+1, t, path))
+	blueprint.debugResource()
+	if target == "" {
+		for _, t := range allType {
+			newBlueprint := copyBlueprint(blueprint)
+			waitTime := robot.timeTillBuildable(newBlueprint)
+			if waitTime > 24-time {
+				result = blueprint.resource["geode"]
+				fmt.Println("path: ", path)
+				fmt.Println("result: ", result)
+				if result > 9 {
+					panic("debug")
+				}
+				return blueprint.resource["geode"]
+			}
+			result = utils.Max(result, process(newBlueprint, time+1, t, path))
+		}
+	} else {
+		result = process(blueprint, time+1, target, path)
 	}
 	// collect
 	return result
