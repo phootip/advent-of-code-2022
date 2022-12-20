@@ -15,8 +15,8 @@ var allType [4]string
 func Sol1() (ans int) {
 	fmt.Println("Starting Day19 Solution1...")
 	allType = [4]string{"ore", "clay", "obsidian", "geode"}
-	// raw := utils.ReadFile("./day19/input.txt")
-	raw := utils.ReadFile("./day19/example.txt")
+	raw := utils.ReadFile("./day19/input.txt")
+	// raw := utils.ReadFile("./day19/example.txt")
 	raw = raw[:len(raw)-1]
 	blueprints := rawToBlueprint(raw)
 	ans = bestBlueprint(blueprints)
@@ -25,30 +25,32 @@ func Sol1() (ans int) {
 
 func bestBlueprint(blueprints []*Blueprint) (ans int) {
 	for _, blueprint := range blueprints {
-		ans = utils.Max(ans, bestGeodes(blueprint))
-		// fmt.Println(mem)
+		ans += bestGeodes(blueprint)*blueprint.id
+		fmt.Println(ans)
 	}
 	return ans
 }
 
 func bestGeodes(blueprint *Blueprint) (result int) {
 	fmt.Println("calculating blueprint: ", blueprint.id)
-	fmt.Println("blueprint: ", blueprint)
+	// fmt.Println("blueprint: ", blueprint)
 	time := 0
-	bestPath := []string{"clay", "clay", "obsidian", "clay", "obsidian", "geode", "geode"}
-	_ = bestPath
+	// bestPath := []string{"clay", "clay", "obsidian", "clay", "obsidian", "geode", "geode"}
+	debugPath := []string{"ore","clay","clay","clay","clay","clay","clay", "obsidian","obsidian","obsidian","obsidian", "clay", "obsidian", "geode", "obsidian", "geode","obsidian", "geode"}
+	_ = debugPath
 	// result = utils.Max(process(blueprint, time, "ore", []string{}, bestPath), process(blueprint, time, "clay", []string{}, bestPath))
 	mem = make(map[string]int)
-	result, bestPath = process(blueprint, time, "clay", []string{}, bestPath)
-	fmt.Println("bestPath: ", bestPath)
-	fmt.Println("len(mem):", len(mem))
-	fmt.Println("result1: ", result)
+	result, bestPath := process(blueprint, time, "clay", []string{}, debugPath)
+	// fmt.Println("bestPath: ", bestPath)
+	// fmt.Println("len(mem):", len(mem))
+	// fmt.Println("result1: ", result)
 	mem = make(map[string]int)
-	result2, bestPath2 := process(blueprint, time, "ore", []string{}, bestPath)
-	fmt.Println("bestPath2: ", bestPath2)
-	fmt.Println("len(mem):", len(mem))
-	fmt.Println("result2: ", result2)
+	result2, bestPath2 := process(blueprint, time, "ore", []string{}, debugPath)
+	// fmt.Println("bestPath2: ", bestPath2)
+	// fmt.Println("len(mem):", len(mem))
+	// fmt.Println("result2: ", result2)
 	// return result
+	_,_ = bestPath, bestPath2
 	return utils.Max(result, result2)
 }
 
@@ -56,21 +58,18 @@ func process(oldBlueprint *Blueprint, time int, target string, path []string, de
 	if oldBlueprint.overLimit() {
 		mem[strings.Join(path, ",")] = -1
 	}
-	// for i := range path {
-	// 	if mem[strings.Join(path[:i+1], ",")] != 0 {
-	// 		return mem[strings.Join(path, ",")], path
-	// 	}
-	// }
 	if mem[strings.Join(path, ",")] != 0 {
 		return mem[strings.Join(path, ",")], path
 	}
 	blueprint := copyBlueprint(oldBlueprint)
 	// fmt.Println("time: ", time)
-	// fmt.Println("target: ", target)
-	// fmt.Println("path: ", path)
 	result := 0
 	robot := blueprint.robots[target]
 	waitTime := robot.timeTillBuildable(blueprint)
+	// fmt.Println("target: ", target)
+	// fmt.Println("path: ", path)
+	// fmt.Println("debugPath: ", debugPath)
+	// fmt.Println("waitTime: ", waitTime)
 	if waitTime > 24-time {
 		timeLeft := 24-time
 		result = blueprint.resource["geode"]
@@ -79,10 +78,6 @@ func process(oldBlueprint *Blueprint, time int, target string, path []string, de
 		if result == 0 {
 			mem[strings.Join(path, ",")] = -1
 		}
-		if result == 9 {
-			fmt.Println(blueprint)
-			fmt.Println(timeLeft)
-		}
 		return result, path
 	}
 	// newBlueprint := copyBlueprint(blueprint)
@@ -90,18 +85,20 @@ func process(oldBlueprint *Blueprint, time int, target string, path []string, de
 	blueprint.build(target)
 	path = append(path, target)
 	endtime := time + waitTime
+
 	// fmt.Println("endtime: ", endtime)
 	// blueprint.debugResource()
 	// if len(debugPath) > 0 {
 	// 	newBlueprint := copyBlueprint(blueprint)
 	// 	nextTarget := debugPath[0]
 	// 	debugPath = debugPath[1:]
-	// 	result = utils.Max(result, process(newBlueprint, endtime, nextTarget, path, debugPath))
-	// 	return result
+	// 	return process(newBlueprint, endtime, nextTarget, path, debugPath)
 	// }
 	// if len(debugPath) == 0 {
+	// 	panic("debug")
 	// 	return process(blueprint, endtime, "geode", path, debugPath)
 	// }
+	// panic("don't come here")
 	bestPath := []string{}
 	_ = bestPath
 	for _, t := range allType {
@@ -137,15 +134,20 @@ func (robot *Robot) timeTillBuildable(blueprint *Blueprint) int {
 	maxTime := 0
 	for cost := range robot.costs {
 		costLeft := robot.costs[cost] - blueprint.resource[cost]
+		var time int
+		if costLeft > 0 {
+			time = costLeft / blueprint.robotCounts[cost]
+			if costLeft%blueprint.robotCounts[cost] != 0 {
+				time++
+			}
+		} else {
+			time = 0
+		}
 		// fmt.Println("cost Type: ", cost)
 		// fmt.Println("robot Cost: ", robot.costs[cost])
 		// fmt.Println("resource now: ", blueprint.resource[cost])
 		// fmt.Println("cost left: ", costLeft)
 		// fmt.Println("robotCount: ", blueprint.robotCounts[cost])
-		time := costLeft / blueprint.robotCounts[cost]
-		if costLeft%blueprint.robotCounts[cost] != 0 {
-			time++
-		}
 		maxTime = utils.Max(maxTime, time)
 	}
 	// fmt.Println("waitTime: ", maxTime)
