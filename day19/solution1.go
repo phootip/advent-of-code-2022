@@ -24,7 +24,6 @@ func Sol1() (ans int) {
 
 func bestBlueprint(blueprints []*Blueprint) (ans int) {
 	for _, blueprint := range blueprints {
-		mem = make(map[string]int)
 		ans = utils.Max(ans, bestGeodes(blueprint))
 		// fmt.Println(mem)
 	}
@@ -33,25 +32,36 @@ func bestBlueprint(blueprints []*Blueprint) (ans int) {
 
 func bestGeodes(blueprint *Blueprint) (result int) {
 	fmt.Println("calculating blueprint: ", blueprint.id)
+	fmt.Println("blueprint: ", blueprint)
 	time := 0
-	bestPath := []string{"clay","clay","obsidian","clay","obsidian","geode","geode"}
+	bestPath := []string{"clay", "clay", "obsidian", "clay", "obsidian", "geode", "geode"}
 	_ = bestPath
 	// result = utils.Max(process(blueprint, time, "ore", []string{}, bestPath), process(blueprint, time, "clay", []string{}, bestPath))
-	fmt.Println(blueprint)
+	mem = make(map[string]int)
 	result, bestPath = process(blueprint, time, "clay", []string{}, bestPath)
-	fmt.Println("result1: ", result)
 	fmt.Println("bestPath: ", bestPath)
-	fmt.Println(blueprint)
+	fmt.Println("len(mem):", len(mem))
+	fmt.Println("result1: ", result)
+	mem = make(map[string]int)
 	result2, bestPath2 := process(blueprint, time, "ore", []string{}, bestPath)
-	fmt.Println("result2: ", result2)
 	fmt.Println("bestPath2: ", bestPath2)
+	fmt.Println("len(mem):", len(mem))
+	fmt.Println("result2: ", result2)
 	// return result
 	return utils.Max(result, result2)
 }
 
-func process(oldBlueprint *Blueprint, time int, target string, path []string, debugPath []string) (int,[]string) {
-	if mem[strings.Join(path,",")] != 0 {
-		return mem[strings.Join(path,",")], path
+func process(oldBlueprint *Blueprint, time int, target string, path []string, debugPath []string) (int, []string) {
+	if oldBlueprint.overLimit() {
+		mem[strings.Join(path, ",")] = -1
+	}
+	// for i := range path {
+	// 	if mem[strings.Join(path[:i+1], ",")] != 0 {
+	// 		return mem[strings.Join(path, ",")], path
+	// 	}
+	// }
+	if mem[strings.Join(path, ",")] != 0 {
+		return mem[strings.Join(path, ",")], path
 	}
 	blueprint := copyBlueprint(oldBlueprint)
 	// fmt.Println("time: ", time)
@@ -62,16 +72,16 @@ func process(oldBlueprint *Blueprint, time int, target string, path []string, de
 	// fmt.Println(robot)
 	waitTime := robot.timeTillBuildable(blueprint)
 	if waitTime > 24-time {
-		timeLeft := 24-time
+		timeLeft := 24 - time
 		result = blueprint.resource["geode"]
-		result += timeLeft*blueprint.robotCounts["geode"]
+		result += timeLeft * blueprint.robotCounts["geode"]
 		// if result == 5 {
 		// 	fmt.Println("path: ", path)
 		// 	fmt.Println("result: ", result)
 		// }
-		mem[strings.Join(path,",")] = result
+		mem[strings.Join(path, ",")] = result
 		if result == 0 {
-			mem[strings.Join(path,",")] = -1
+			mem[strings.Join(path, ",")] = -1
 		}
 		return result, path
 	}
@@ -105,12 +115,21 @@ func process(oldBlueprint *Blueprint, time int, target string, path []string, de
 	// if time > 0 {
 	// 	fmt.Println("bestPath: ", bestPath)
 	// }
-	mem[strings.Join(path,",")] = result
+	mem[strings.Join(path, ",")] = result
 	if result == 0 {
-		mem[strings.Join(path,",")] = -1
+		mem[strings.Join(path, ",")] = -1
 	}
 	// fmt.Println("bestPath :",bestPath)
 	return result, bestPath
+}
+
+func (blueprint *Blueprint) overLimit() bool {
+	for _, t := range []string{"ore","clay","obsidian"} {
+		if blueprint.robotCounts[t] > blueprint.robotLimits[t] {
+			return true
+		}
+	}
+	return false
 }
 
 func (robot *Robot) timeTillBuildable(blueprint *Blueprint) int {
@@ -134,7 +153,7 @@ func (robot *Robot) timeTillBuildable(blueprint *Blueprint) int {
 		maxTime = utils.Max(maxTime, time)
 	}
 	// fmt.Println("waitTime: ", maxTime)
-	return maxTime+1
+	return maxTime + 1
 }
 
 // func memBlueprint(blueprint *Blueprint, result int) {
@@ -185,8 +204,10 @@ func copyBlueprint(blueprint *Blueprint) *Blueprint {
 	newBlueprint.robots = blueprint.robots
 	newBlueprint.robotCounts = make(map[string]int)
 	newBlueprint.resource = make(map[string]int)
+	newBlueprint.robotLimits = make(map[string]int)
 	utils.CopyMap(newBlueprint.robotCounts, blueprint.robotCounts)
 	utils.CopyMap(newBlueprint.resource, blueprint.resource)
+	utils.CopyMap(newBlueprint.robotLimits, blueprint.robotLimits)
 	return &newBlueprint
 }
 
@@ -207,6 +228,7 @@ func rawToBlueprint(raw []string) (blueprints []*Blueprint) {
 		blueprint.robots = map[string]*Robot{}
 		blueprint.robotCounts = map[string]int{}
 		blueprint.resource = map[string]int{}
+		blueprint.robotLimits = map[string]int{}
 		blueprint.robots["ore"] = &Robot{robotType: "ore", costs: map[string]int{"ore": utils.StringToInt(line2[6])}}
 		blueprint.robots["clay"] = &Robot{robotType: "clay", costs: map[string]int{"ore": utils.StringToInt(line2[12])}}
 		blueprint.robots["obsidian"] = &Robot{robotType: "obsidian", costs: map[string]int{"ore": utils.StringToInt(line2[18]), "clay": utils.StringToInt(line2[21])}}
@@ -214,6 +236,13 @@ func rawToBlueprint(raw []string) (blueprints []*Blueprint) {
 		for k := range blueprint.robots {
 			blueprint.robotCounts[k] = 0
 			blueprint.resource[k] = 0
+		}
+		for _, t := range []string{"ore","clay","obsidian"} {
+			limit := 0
+			for _, t2 := range allType {
+				limit = utils.Max(limit, blueprint.robots[t2].costs[t])
+			}
+			blueprint.robotLimits[t] = limit
 		}
 		blueprint.robotCounts["ore"] = 1
 		blueprints = append(blueprints, &blueprint)
@@ -225,6 +254,7 @@ type Blueprint struct {
 	id          int
 	robots      map[string]*Robot
 	robotCounts map[string]int
+	robotLimits map[string]int
 	resource    map[string]int
 }
 
