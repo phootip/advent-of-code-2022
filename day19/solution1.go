@@ -7,7 +7,8 @@ import (
 	"github.com/phootip/advent-of-code-2022/utils"
 )
 
-// var mem map[[4]int]map[[4]int]int
+// (24, (1, 4, 2, 2), (4, 20, 8, 9))
+// (24, (3, 5, 6, 4), (4, 20, 6, 12))
 var mem map[string]int
 var allType [4]string
 
@@ -69,19 +70,18 @@ func process(oldBlueprint *Blueprint, time int, target string, path []string, de
 	// fmt.Println("path: ", path)
 	result := 0
 	robot := blueprint.robots[target]
-	// fmt.Println(robot)
 	waitTime := robot.timeTillBuildable(blueprint)
 	if waitTime > 24-time {
-		timeLeft := 24 - time
+		timeLeft := 24-time
 		result = blueprint.resource["geode"]
 		result += timeLeft * blueprint.robotCounts["geode"]
-		// if result == 5 {
-		// 	fmt.Println("path: ", path)
-		// 	fmt.Println("result: ", result)
-		// }
 		mem[strings.Join(path, ",")] = result
 		if result == 0 {
 			mem[strings.Join(path, ",")] = -1
+		}
+		if result == 9 {
+			fmt.Println(blueprint)
+			fmt.Println(timeLeft)
 		}
 		return result, path
 	}
@@ -107,19 +107,15 @@ func process(oldBlueprint *Blueprint, time int, target string, path []string, de
 	for _, t := range allType {
 		newBlueprint := copyBlueprint(blueprint)
 		newResult, newPath := process(newBlueprint, endtime, t, path, debugPath)
-		if newResult > result {
+		if newResult >= result {
 			result = newResult
 			bestPath = newPath
 		}
 	}
-	// if time > 0 {
-	// 	fmt.Println("bestPath: ", bestPath)
-	// }
 	mem[strings.Join(path, ",")] = result
 	if result == 0 {
 		mem[strings.Join(path, ",")] = -1
 	}
-	// fmt.Println("bestPath :",bestPath)
 	return result, bestPath
 }
 
