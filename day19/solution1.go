@@ -9,9 +9,11 @@ import (
 
 // var mem map[[4]int]map[[4]int]int
 var mem map[*Blueprint]int
+var allType [4]string
 
 func Sol1() (ans int) {
 	fmt.Println("Starting Day19 Solution1...")
+	allType = [4]string{"ore", "clay", "obsidian", "geode"}
 	// raw := utils.ReadFile("./day19/input.txt")
 	raw := utils.ReadFile("./day19/example.txt")
 	raw = raw[:len(raw)-1]
@@ -31,50 +33,89 @@ func bestBlueprint(blueprints []*Blueprint) (ans int) {
 
 func bestGeodes(blueprint *Blueprint) (result int) {
 	fmt.Println("calculating blueprint: ", blueprint.id)
-	time := 0
-	result = process(blueprint, time)
+	time := 1
+	result = process(blueprint, time, "clay", []string{})
 	fmt.Println("result: ", result)
 	return result
 }
 
-func process(blueprint *Blueprint, time int) int {
-	if mem[blueprint] != 0 {
-		return  mem[blueprint]
-	}
+func process(blueprint *Blueprint, time int, target string, path []string) int {
 	if time > 24 {
-		// fmt.Println(len(mem))
-		memBlueprint(blueprint, blueprint.resource["geode"])
+		fmt.Println("path: ", path)
+		fmt.Println("geode: ", blueprint.resource["geode"])
 		return blueprint.resource["geode"]
 	}
 	// fmt.Println("time: ", time)
-	// build
-	result := 0
-	for _, robot := range blueprint.robots {
-		if robot.buildable(blueprint.resource) {
-			// fmt.Println("try building robot: ", robot)
-			newBlueprint := copyBlueprint(blueprint)
-			newBlueprint.build(robot.robotType)
-			newBlueprint.updateResource()
-			result = utils.Max(result, process(newBlueprint, time+1))
-		}
-	}
-	// if time == 3 {
-	// 	fmt.Println("result: ", result)
+	// fmt.Println("target: ", target)
+	// fmt.Println("path: ", path)
+	// if time == 24 {
 	// 	panic("debug")
 	// }
+	// build
+	result := 0
+	robot := blueprint.robots[target]
+	fmt.Println(robot)
+	waitTime := robot.timeTillBuildable(blueprint)
+	if waitTime > 24-time {
+		result = blueprint.resource["geode"]
+		fmt.Println("path: ", path)
+		fmt.Println("result: ", result)
+		if result > 9 {
+			panic("debug")
+		}
+		return blueprint.resource["geode"]
+	}
+	// newBlueprint := copyBlueprint(blueprint)
+	blueprint.updateResource(waitTime)
+	blueprint.build(target)
+	blueprint.updateResource(1)
+	path = append(path, target)
+	fmt.Println("endtime: ", time+waitTime)
+	// blueprint.debugResource()
+	for _, t := range allType {
+		newBlueprint := copyBlueprint(blueprint)
+		result = utils.Max(result, process(newBlueprint, time+waitTime+1, t, path))
+	}
 	// collect
-	blueprint.updateResource()
-	result = utils.Max(result, process(blueprint, time+1))
-	memBlueprint(blueprint, result)
 	return result
 }
 
-func memBlueprint(blueprint *Blueprint, result int) {
-		fmt.Println(&blueprint)
-		mem[blueprint] = result
-		if mem[blueprint] == 0 {
-			mem[blueprint] = -1
+func (robot *Robot) timeTillBuildable(blueprint *Blueprint) int {
+	for cost := range robot.costs {
+		if blueprint.robotCounts[cost] == 0 {
+			return 9999
 		}
+	}
+	maxTime := 0
+	for cost := range robot.costs {
+		costLeft := robot.costs[cost] - blueprint.resource[cost]
+		// fmt.Println("cost Type: ", cost)
+		// fmt.Println("robot Cost: ", robot.costs[cost])
+		// fmt.Println("resource left: ", blueprint.resource[cost])
+		// fmt.Println("cost left: ", costLeft)
+		// fmt.Println("robotCount: ", blueprint.robotCounts[cost])
+		if costLeft <= 0 {
+			return 1
+		}
+		time := costLeft / blueprint.robotCounts[cost]
+		if costLeft%blueprint.robotCounts[cost] != 0 {
+			time++
+		}
+		maxTime = utils.Max(maxTime, time)
+	}
+	if maxTime == 0 {
+		panic("waitTime can't be 0")
+	}
+	fmt.Println("waitTime: ", maxTime)
+	return maxTime
+}
+
+func memBlueprint(blueprint *Blueprint, result int) {
+	fmt.Println(&blueprint)
+	mem[blueprint] = result
+	if mem[blueprint] == 0 {
+		mem[blueprint] = -1
+	}
 }
 
 func mapToArr(a map[string]int) [4]int {
@@ -85,12 +126,23 @@ func mapToArr(a map[string]int) [4]int {
 	return result
 }
 
-func (blueprint *Blueprint) updateResource() {
+func (blueprint *Blueprint) updateResource(waitTime int) {
 	for k := range blueprint.resource {
-		blueprint.resource[k] += blueprint.robotCounts[k]
+		blueprint.resource[k] += blueprint.robotCounts[k] * waitTime
 		// fmt.Println("robotCount: ", k, blueprint.robotCounts[k])
 		// fmt.Println("resource: ", k, blueprint.resource[k])
 	}
+}
+
+func (blueprint *Blueprint) debugResource() {
+	for k := range blueprint.resource {
+		fmt.Println("robotCount: ", k, blueprint.robotCounts[k])
+		// fmt.Println("resource: ", k, blueprint.resource[k])
+	}
+	for k := range blueprint.resource {
+		fmt.Println("resource: ", k, blueprint.resource[k])
+	}
+	fmt.Println()
 }
 
 func (blueprint *Blueprint) build(robotType string) {
