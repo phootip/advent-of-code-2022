@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/phootip/advent-of-code-2022/day1"
 	"github.com/phootip/advent-of-code-2022/day10"
@@ -89,7 +90,9 @@ func main() {
 		fmt.Println("answer: ", day18.Sol1())
 		fmt.Println("answer: ", day18.Sol2())
 	case "19":
-		// fmt.Println("answer: ", day19.Sol1())
+		fmt.Println("answer: ", day19.Sol1())
+		fmt.Println("Starting part2...")
+		time.Sleep(5 * time.Second)
 		fmt.Println("answer: ", day19.Sol2())
 	}
 

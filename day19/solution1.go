@@ -13,6 +13,7 @@ var mem map[string]int
 var allType [4]string
 
 func Sol1() (ans int) {
+	uniTime = 24
 	fmt.Println("Starting Day19 Solution1...")
 	allType = [4]string{"ore", "clay", "obsidian", "geode"}
 	raw := utils.ReadFile("./day19/input.txt")
@@ -25,7 +26,8 @@ func Sol1() (ans int) {
 
 func bestBlueprint(blueprints []*Blueprint) (ans int) {
 	for _, blueprint := range blueprints {
-		ans += bestGeodes(blueprint)*blueprint.id
+		globalBest = 0
+		ans += bestGeodes2(blueprint)*blueprint.id
 		fmt.Println(ans)
 	}
 	return ans

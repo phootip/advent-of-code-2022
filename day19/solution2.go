@@ -59,6 +59,7 @@ func bestGeodes2(blueprint *Blueprint) (result int) {
 	fmt.Println("result2: ", result2)
 	elapsed = time.Since(start)
 	log.Printf("Execution took %s", elapsed)
+	fmt.Println()
 	_ = bestPath
 	// return result
 	_ = bestPath2
