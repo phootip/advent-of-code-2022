@@ -109,3 +109,12 @@ func CopyMap[T map[string]int](map1 T, map2 T) T{
 	}
 	return map1
 }
+
+func SliceIndex[T int](slice []T, item T) int {
+	for i, item2 := range slice {
+		if item == item2 {
+			return i
+		}
+	}
+	return -1
+}

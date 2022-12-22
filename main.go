@@ -17,6 +17,7 @@ import (
 	"github.com/phootip/advent-of-code-2022/day18"
 	"github.com/phootip/advent-of-code-2022/day19"
 	"github.com/phootip/advent-of-code-2022/day2"
+	"github.com/phootip/advent-of-code-2022/day20"
 	"github.com/phootip/advent-of-code-2022/day3"
 	"github.com/phootip/advent-of-code-2022/day4"
 	"github.com/phootip/advent-of-code-2022/day5"
@@ -94,6 +95,9 @@ func main() {
 		fmt.Println("Starting part2...")
 		time.Sleep(5 * time.Second)
 		fmt.Println("answer: ", day19.Sol2())
+	case "20":
+		fmt.Println("answer: ", day20.Sol1())
+		// fmt.Println("answer: ", day20.Sol2())
 	}
 
 }
