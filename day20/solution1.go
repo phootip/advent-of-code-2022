@@ -6,69 +6,111 @@ import (
 	"github.com/phootip/advent-of-code-2022/utils"
 )
 
+var mem = []*Node{}
+
 // 1306 too low
+// -3277 value duped brah
 func Sol1() (ans int) {
 	fmt.Println("Starting Day20 Solution1...")
 	raw := utils.ReadFile("./day20/input.txt")
 	// raw := utils.ReadFile("./day20/example.txt")
 	raw = raw[:len(raw)-1]
-	data := parseRaw(raw)
-	ans = answer1(data)
+	root := parseRaw(raw)
+	swapNodes(root)
+	ans = answer1()
 	return ans
 }
 
-func answer1(data []int) (ans int) {
-	newData := make([]int, len(data))
-	copy(newData, data)
-	fmt.Println("newData: ", newData)
-	// swap
-	for _, num := range data {
-		idx := utils.SliceIndex(newData, num)
-		// fmt.Println("idx: ", idx)
-		// fmt.Println("num: ", num)
-		newData = swap(newData, idx, idx+num)
-		fmt.Println()
+func answer1() (ans int) {
+	root := findNodeWithVal(0)
+	// debug()
+	for i := 0; i <= 3000; i++ {
+		if i == 1000 || i == 2000 || i == 3000 {
+			fmt.Println(root.value)
+			ans += root.value
+		}
+		root = root.next
 	}
-	idx0 := utils.SliceIndex(newData, 0)
-	idx1 := (idx0+1000)%len(newData)
-	idx2 := (idx0+2000)%len(newData)
-	idx3 := (idx0+3000)%len(newData)
-	fmt.Println("idx1:",idx1)
-	fmt.Println("idx2:",idx2)
-	fmt.Println("idx3:",idx3)
-	ans1 := newData[idx1]
-	ans2 := newData[idx2]
-	ans3 := newData[idx3]
-	return ans1+ans2+ans3
+	return ans
 }
 
-func swap(slice []int, idx1 int, idx2 int) []int {
-	fmt.Println("idx1&2: ",idx1, idx2)
-	idx1 = reduceIndex(len(slice), idx1)
-	idx2 = reduceIndex(len(slice), idx2)
-	fmt.Println("idx1&2 after process: ",idx1, idx2)
-	num := slice[idx1]
-	fmt.Println("Moving num:", num)
-	result := append(slice[:idx1], slice[idx1+1:]...)
-	result = append(result[:idx2+1], result[idx2:]...)
-	result[idx2] = num
-	return result
+func swapNodes(root *Node) {
+	// debug()
+	// swap node
+	for _, n := range mem {
+		node := n
+		num := n.value
+		// fmt.Println("Moving num:", num)
+		movingNode := node
+		node.prev.next = node.next
+		node.next.prev = node.prev
+		node = node.next
+		// fmt.Println("Node popped")
+		// debug()
+		for num > 0 {
+			node = node.next
+			num--
+		}
+		for num < 0 {
+			num++
+			node = node.prev
+		}
+		movingNode.next = node
+		movingNode.prev = node.prev
+		movingNode.prev.next = movingNode
+		movingNode.next.prev = movingNode
+		// fmt.Println("Node added")
+		// debug()
+		// fmt.Println()
+	}
 }
 
-func reduceIndex(length int, idx int)  int {
-	for idx >= length || idx <= -length{
-		idx = idx%length+idx/length
+func parseRaw(raw []string) *Node {
+	// phantom := Node{}
+	for i, line := range raw {
+		mem = append(mem, &Node{nil, nil, utils.StringToInt(line)})
+		if i > 0 {
+			mem[i-1].next = mem[i]
+			mem[i].prev = mem[i-1]
+		}
 	}
-	if idx < 0 {
-		idx = length-1 + idx
-	}
-	return idx
+	mem[len(mem)-1].next = mem[0]
+	mem[0].prev = mem[len(mem)-1]
+	return mem[0]
 }
 
-func parseRaw(raw []string) (data []int) {
-	for _, line := range raw {
-		num := utils.StringToInt(line)
-		data = append(data, num)
+func debug() {
+	root := findNodeWithVal(0)
+	for i := range mem {
+		_ = i
+		fmt.Print(root.value, ",")
+		root = root.next
 	}
-	return data
+	fmt.Println()
+	for i := range mem {
+		_ = i
+		// fmt.Print(root.value,",")
+		fmt.Println(root.prev.value, root.value, root.next.value)
+		root = root.next
+	}
+	fmt.Println()
+}
+
+// func findNode(node *Node) *Node {
+
+// }
+
+func findNodeWithVal(value int) *Node {
+	for _, node := range mem {
+		if node.value == value {
+			return node
+		}
+	}
+	return nil
+}
+
+type Node struct {
+	next  *Node
+	prev  *Node
+	value int
 }
