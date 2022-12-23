@@ -87,12 +87,12 @@ func debug() {
 		root = root.next
 	}
 	fmt.Println()
-	for i := range mem {
-		_ = i
-		// fmt.Print(root.value,",")
-		fmt.Println(root.prev.value, root.value, root.next.value)
-		root = root.next
-	}
+	// for i := range mem {
+	// 	_ = i
+	// 	// fmt.Print(root.value,",")
+	// 	fmt.Println(root.prev.value, root.value, root.next.value)
+	// 	root = root.next
+	// }
 	fmt.Println()
 }
 

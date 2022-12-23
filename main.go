@@ -96,8 +96,8 @@ func main() {
 		time.Sleep(5 * time.Second)
 		fmt.Println("answer: ", day19.Sol2())
 	case "20":
-		fmt.Println("answer: ", day20.Sol1())
-		// fmt.Println("answer: ", day20.Sol2())
+		// fmt.Println("answer: ", day20.Sol1())
+		fmt.Println("answer: ", day20.Sol2())
 	}
 
 }
