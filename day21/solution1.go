@@ -19,34 +19,101 @@ func Sol1() (ans int) {
 	return ans
 }
 
-// func resolve(monkeys map[string]*Monkey) (ans int) {
-// 	root := monkeys["root"]
-// 	stack := []*Monkey{root}
-// 	visited := []*Monkey{}
+func Sol2() (ans int) {
+	fmt.Println("Starting Day21 Solution2...")
+	// raw := utils.ReadFile("./day21/input.txt")
+	raw := utils.ReadFile("./day21/example.txt")
+	raw = raw[:len(raw)-1]
+	monkeys := parseRaw(raw)
+	// monkeys["root"].op = "="
+	// you := monkeys["humn"]
+	you := "humn"
+	// fmt.Println(you)
+	// debug(monkeys)
+	ans = resolve2(monkeys, you)
+	return ans
+}
+func resolve2(monkeys map[string]*Monkey, you string) (ans int) {
+	// ans, path := monkeys["root"].getValue2([]*Monkey{})
+	// fmt.Println(path)
+	root := monkeys["root"]
+	// monkeys["humn"].hasValue = false
+	stack := []*Monkey{root}
+	// stack := []*Monkey{root.monkey1P, root.monkey2P}
+	// visited := []*Monkey{}
 
-// 	for len(stack) > 0 {
-// 		monkey := stack[len(stack)-1]
-// 		stack = stack[:len(stack)-1]
-// 		monkey1 := monkeys[monkey.monkey1]
-// 		monkey2 := monkeys[monkey.monkey2]
-// 		if monkey.hasValue {
-// 			continue
-// 		}
-// 		if !monkey1.hasValue {
-// 			stack = append(stack, monkey1)
-// 			visited = append(visited, monkey1)
-// 		}
-// 		if !monkey2.hasValue {
-// 			stack = append(stack, monkey2)
-// 			visited = append(visited, monkey2)
-// 		}
-// 	}
-// 	return monkeys["root"].value
-// }
+	for len(stack) > 0 {
+		m := stack[len(stack)-1]
+
+		if m.name == you {
+			fmt.Println("found human: ",m)
+			for _, m := range stack {
+				fmt.Println(m)
+			}
+			break
+		}
+		if !m.monkey1P.hasValue {
+			stack = append(stack, m.monkey1P)
+			continue
+		}
+		if !m.monkey2P.hasValue {
+			stack = append(stack, m.monkey2P)
+			continue
+		}
+		m.value = m.resolveValue()
+		m.hasValue = true
+		stack = stack[:len(stack)-1]
+	}
+
+	return root.value
+}
 
 func resolve(monkeys map[string]*Monkey) (ans int) {
-	// root := monkeys["root"]
 	return monkeys["root"].getValue()
+}
+
+func (m *Monkey) resolveValue() int {
+	a := m.monkey1P.value
+	b := m.monkey2P.value
+	m.hasValue = true
+	switch m.op {
+	case "+":
+		return a + b
+	case "-":
+		return a - b
+	case "*":
+		return a * b
+	case "/":
+		return a / b
+	}
+	panic("can't resolve value")
+}
+
+func (monkey *Monkey) getValue2(path []*Monkey) (int, []*Monkey) {
+	// fmt.Println("Getting monkey value:", monkey)
+	path = append(path, monkey)
+	if monkey.hasValue {
+		return monkey.value, path
+	}
+	monkey1 := monkey.monkey1P
+	monkey2 := monkey.monkey2P
+	a := monkey1.getValue()
+	b := monkey2.getValue()
+	switch monkey.op {
+	case "+":
+		return a + b, path
+	case "-":
+		return a - b, path
+	case "*":
+		return a * b, path
+	case "/":
+		return a / b, path
+	case "=":
+		fmt.Println("a:", a)
+		fmt.Println("b:", b)
+		return 0, path
+	}
+	panic("can't calculate monkey value")
 }
 
 func (monkey *Monkey) getValue() int {
@@ -96,6 +163,8 @@ func parseRaw(raw []string) map[string]*Monkey {
 		}
 		m.monkey1P = monkeys[m.monkey1]
 		m.monkey2P = monkeys[m.monkey2]
+		m.monkey1P.parent = m
+		m.monkey2P.parent = m
 	}
 	return monkeys
 }
@@ -115,4 +184,6 @@ type Monkey struct {
 	op       string
 	monkey2  string
 	monkey2P *Monkey
+	parent   *Monkey
+	// path     []string
 }
