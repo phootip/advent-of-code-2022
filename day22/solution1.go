@@ -21,6 +21,9 @@ func Sol1() (ans int) {
 	raw := utils.ReadFile("./day22/input.txt")
 	// raw := utils.ReadFile("./day22/example.txt")
 	raw = raw[:len(raw)-1]
+	globalPlayer = &Player{}
+	limitY = 0
+	limitX = 0
 	cube, insts, player := parseRaw(raw)
 	ans = resolve(cube, insts, player)
 	return ans
@@ -37,12 +40,6 @@ func resolve(cube map[int]map[int]int, insts []*Inst, player *Player) (ans int) 
 		}
 		// turn
 		player.turn(inst.turn)
-		// fmt.Println(inst)
-		// debug(cube)
-		// if i == 3 {
-		// 	break
-		// }
-
 	}
 	ans += 1000 * (player.y + 1)
 	ans += 4 * (player.x + 1)
@@ -116,20 +113,19 @@ func (p *Player) move() bool {
 		case 2:
 			return false
 		}
-		return true
 	}
-	return false
+	panic("move did not return")
 }
 
 func (p *Player) getLoopPos() (int, int) {
 	if p.dirX == 1 && p.dirY == 0 {
-		return minXs[p.y], p.y
+		return p.minXs[p.y], p.y
 	} else if p.dirX == 0 && p.dirY == 1 {
-		return p.x, minYs[p.x]
+		return p.x, p.minYs[p.x]
 	} else if p.dirX == -1 && p.dirY == 0 {
-		return maxXs[p.y], p.y
+		return p.maxXs[p.y], p.y
 	} else if p.dirX == 0 && p.dirY == -1 {
-		return p.x, maxYs[p.x]
+		return p.x, p.maxYs[p.x]
 	}
 	panic("can't get LoopPos")
 }
@@ -215,15 +211,16 @@ func parseCube(rawCube []string, player *Player) map[int]map[int]int {
 }
 
 type Player struct {
-	x     int
-	y     int
-	dirX  int
-	dirY  int
-	cube  map[int]map[int]int
-	minXs []int
-	maxXs []int
-	minYs []int
-	maxYs []int
+	x        int
+	y        int
+	dirX     int
+	dirY     int
+	cube     map[int]map[int]int
+	minXs    []int
+	maxXs    []int
+	minYs    []int
+	maxYs    []int
+	cubeSize int
 }
 
 type Inst struct {
