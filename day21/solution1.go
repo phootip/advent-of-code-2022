@@ -21,18 +21,67 @@ func Sol1() (ans int) {
 
 func Sol2() (ans int) {
 	fmt.Println("Starting Day21 Solution2...")
-	// raw := utils.ReadFile("./day21/input.txt")
-	raw := utils.ReadFile("./day21/example.txt")
+	raw := utils.ReadFile("./day21/input.txt")
+	// raw := utils.ReadFile("./day21/example.txt")
 	raw = raw[:len(raw)-1]
 	monkeys := parseRaw(raw)
-	// monkeys["root"].op = "="
-	// you := monkeys["humn"]
-	// you := "humn"
-	// fmt.Println(you)
-	// debug(monkeys)
-	ans = resolve2(monkeys)
+	ans = resolve3(monkeys, "humn")
 	return ans
 }
+func resolve3(monkeys map[string]*Monkey, you string) (ans int) {
+	root := monkeys["root"]
+	root.op = "="
+	// head1 := root.monkey1P
+	// head2 := root.monkey2P
+	// Find human side
+	ops := []string{}
+	nums := []int{}
+	sides := []string{}
+	left := monkeys[you]
+	var right *Monkey
+	for left != root {
+		parent := left.parent
+		if left == parent.monkey1P {
+			sides = append(sides, "left")
+			right = parent.monkey2P
+		} else {
+			sides = append(sides, "right")
+			right = parent.monkey1P
+		}
+		ops = append(ops, parent.op)
+		nums = append(nums, right.getValue())
+		left = parent
+	}
+	// fmt.Println(ops)
+	// fmt.Println(nums)
+	// fmt.Println(sides)
+	ans = calculateX(ops, nums, sides)
+	return ans
+}
+
+func calculateX(ops []string, nums []int, sides []string) (result int) {
+	for i := len(ops) - 1; i >= 0; i-- {
+		switch ops[i] {
+		case "=":
+			result = nums[i]
+		case "+":
+			result -= nums[i]
+		case "*":
+			result /= nums[i]
+		case "-":
+			if sides[i] == "left" {
+				result += nums[i]
+			} else {
+				result = nums[i] - result
+			}
+		case "/":
+			result *= nums[i]
+		}
+		// fmt.Println(result)
+	}
+	return result
+}
+
 func resolve2(monkeys map[string]*Monkey) (ans int) {
 	// ans, path := monkeys["root"].getValue2([]*Monkey{})
 	// fmt.Println(path)
@@ -118,17 +167,18 @@ func (monkey *Monkey) getValue() int {
 	monkey2 := monkey.monkey2P
 	a := monkey1.getValue()
 	b := monkey2.getValue()
+	monkey.hasValue = true
 	switch monkey.op {
 	case "+":
-		return a + b
+		monkey.value = a + b
 	case "-":
-		return a - b
+		monkey.value = a - b
 	case "*":
-		return a * b
+		monkey.value = a * b
 	case "/":
-		return a / b
+		monkey.value = a / b
 	}
-	panic("can't calculate monkey value")
+	return monkey.value
 }
 
 func parseRaw(raw []string) map[string]*Monkey {
