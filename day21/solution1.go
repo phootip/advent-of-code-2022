@@ -27,13 +27,13 @@ func Sol2() (ans int) {
 	monkeys := parseRaw(raw)
 	// monkeys["root"].op = "="
 	// you := monkeys["humn"]
-	you := "humn"
+	// you := "humn"
 	// fmt.Println(you)
 	// debug(monkeys)
-	ans = resolve2(monkeys, you)
+	ans = resolve2(monkeys)
 	return ans
 }
-func resolve2(monkeys map[string]*Monkey, you string) (ans int) {
+func resolve2(monkeys map[string]*Monkey) (ans int) {
 	// ans, path := monkeys["root"].getValue2([]*Monkey{})
 	// fmt.Println(path)
 	root := monkeys["root"]
@@ -45,13 +45,6 @@ func resolve2(monkeys map[string]*Monkey, you string) (ans int) {
 	for len(stack) > 0 {
 		m := stack[len(stack)-1]
 
-		if m.name == you {
-			fmt.Println("found human: ",m)
-			for _, m := range stack {
-				fmt.Println(m)
-			}
-			break
-		}
 		if !m.monkey1P.hasValue {
 			stack = append(stack, m.monkey1P)
 			continue
