@@ -8,8 +8,8 @@ import (
 
 func Sol1() (ans int) {
 	fmt.Println("Starting Day23 Solution1...")
-	// raw := utils.ReadFile("./day24/input.txt")
-	raw := utils.ReadFile("./day24/example.txt")
+	raw := utils.ReadFile("./day24/input.txt")
+	// raw := utils.ReadFile("./day24/example.txt")
 	raw = raw[:len(raw)-1]
 	game := parseRaw(raw)
 	// game.debug()
@@ -24,33 +24,44 @@ func (g *Game) shortestPath() (ans int) {
 	goal := g.goal
 	root.Fscore(g)
 	heap := []State{root}
+	visited := map[State]bool{}
+	_ = visited
 	for len(heap) > 0 {
 		// get lowest score
 		node := heap[0]
 		heap = heap[1:]
-		fmt.Println("node:",node)
+		// fmt.Println("node:", node)
 		if node.x == goal.x && node.y == goal.y {
 			return node.steps
 		}
 		node.steps++
 		adjPoints := g.getAdjPoint(node)
 		for _, point := range adjPoints {
-			newState := State{Point: point, steps: node.steps}
+			// fmt.Println("adjPoint:", point)
+			newState := State{Point: Point{point.x, point.y}, steps: node.steps}
 			newState.Fscore(g)
+			if visited[newState] {
+				// fmt.Println("State visited:", newState)
+				// fmt.Println(visited)
+				continue
+			}
 			heap = insertHeap(heap, newState)
+			visited[newState] = true
 		}
-		// fmt.Println(heap)
+		// fmt.Println("heap:", heap)
+		// fmt.Println("visited:", visited)
+		// fmt.Println()
 	}
 	panic("can't reach goal")
 }
 
 // can be optimise with binary insert
-func insertHeap(heap []State, state State) []State{
+func insertHeap(heap []State, state State) []State {
 	for i := range heap {
 		if heap[i].score >= state.score {
-			newHeap := append(heap[:i], state)
-			newHeap = append(newHeap, heap[i:]...)
-			return newHeap
+			heap = append(heap[:i+1], heap[i:]...)
+			heap[i] = state
+			return heap
 		}
 	}
 	return append(heap, state)
