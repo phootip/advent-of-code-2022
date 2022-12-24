@@ -15,30 +15,61 @@ func Sol1() (ans int) {
 	// game.debug()
 	fmt.Println("generating rounds...")
 	game.saveRound()
-	game.shortestPath()
-	_ = game
+	ans = game.shortestPath()
 	return ans
 }
 
 func (g *Game) shortestPath() (ans int) {
-	root := State{x: 1, y: 0, steps: 0}
+	root := State{Point: Point{x: 1, y: 0}, steps: 0}
+	goal := g.goal
 	root.Fscore(g)
 	heap := []State{root}
 	for len(heap) > 0 {
 		// get lowest score
 		node := heap[0]
 		heap = heap[1:]
+		fmt.Println("node:",node)
+		if node.x == goal.x && node.y == goal.y {
+			return node.steps
+		}
 		node.steps++
-		graph := g.rounds[node.steps%len(g.rounds)]
-		fmt.Println(graph)
-
-		break
+		adjPoints := g.getAdjPoint(node)
+		for _, point := range adjPoints {
+			newState := State{Point: point, steps: node.steps}
+			newState.Fscore(g)
+			heap = insertHeap(heap, newState)
+		}
+		// fmt.Println(heap)
 	}
-	return ans
+	panic("can't reach goal")
+}
+
+// can be optimise with binary insert
+func insertHeap(heap []State, state State) []State{
+	for i := range heap {
+		if heap[i].score >= state.score {
+			newHeap := append(heap[:i], state)
+			newHeap = append(newHeap, heap[i:]...)
+			return newHeap
+		}
+	}
+	return append(heap, state)
+}
+
+func (g *Game) getAdjPoint(state State) (result []Point) {
+	graph := g.rounds[state.steps%len(g.rounds)]
+	for _, dir := range []Point{{1, 0}, {0, 1}, {0, 0}, {-1, 0}, {0, -1}} {
+		adjPoint := Point{dir.x + state.x, dir.y + state.y}
+		if graph[adjPoint] {
+			continue
+		}
+		result = append(result, adjPoint)
+	}
+	return result
 }
 
 type State struct {
-	x, y  int
+	Point
 	steps int
 	score int
 }
@@ -46,11 +77,11 @@ type State struct {
 func (g *Game) saveRound() {
 	i := 0
 	for {
-		points := []Point{}
+		points := map[Point]bool{}
 		for _, obj := range g.objects {
 			if obj.class == "blizzard" || obj.class == "wall" {
 				point := Point{obj.x, obj.y}
-				points = append(points, point)
+				points[point] = true
 			}
 		}
 		g.rounds = append(g.rounds, points)
@@ -79,7 +110,7 @@ type Point struct {
 	x, y int
 }
 
-func (s State) Fscore(g *Game) int {
+func (s *State) Fscore(g *Game) int {
 	s.score = s.steps + (g.limitX - 1 - s.x) + (g.limitY - s.y)
 	return s.score
 }
@@ -112,7 +143,6 @@ func parseRaw(raw []string) *Game {
 	g.limitX = len(raw[0]) - 1
 	g.limitY = len(raw) - 1
 	g.graph = [][]int{}
-	g.rounds = [][]Point{}
 	for i, line := range raw {
 		for j, r := range line {
 			switch string(r) {
@@ -138,6 +168,7 @@ func parseRaw(raw []string) *Game {
 	g.objects = append(g.objects, &Object{x: g.limitX - 1, y: g.limitY + 1, class: "wall"})
 	g.objects = append(g.objects, &Object{x: 1, y: 0, class: "player", icon: "P"})
 	g.objects = append(g.objects, &Object{x: g.limitX - 1, y: g.limitY, class: "goal", icon: "G"})
+	g.goal = *g.objects[len(g.objects)-1]
 	return g
 
 }
@@ -151,16 +182,13 @@ func (g *Game) getObjAt(x int, y int) (result []*Object) {
 	return result
 }
 
-func (g *Game) debugG(graph []Point) {
+func (g *Game) debugG(graph map[Point]bool) {
 	for i := 0; i <= g.limitY; i++ {
 		for j := 0; j <= g.limitX; j++ {
-			objs := g.getObjAt(j, i)
-			if len(objs) == 0 {
-				fmt.Print(".")
-			} else if len(objs) > 1 {
-				fmt.Print(len(objs))
+			if graph[Point{j, i}] {
+				fmt.Print("#")
 			} else {
-				fmt.Print(objs[0].icon)
+				fmt.Print(".")
 			}
 		}
 		fmt.Println()
@@ -189,7 +217,8 @@ type Game struct {
 	graph          [][]int
 	limitX, limitY int
 	objects        []*Object
-	rounds         [][]Point
+	rounds         []map[Point]bool
+	goal           Object
 }
 
 type Object struct {
