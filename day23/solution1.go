@@ -17,7 +17,7 @@ func Sol1() (ans int) {
 	_ = game
 	for i := 1; i < 11; i++ {
 		// fmt.Println("round:", i)
-		game.simulation(i)
+		game.simulation()
 		game.updateDirOrder()
 		// game.debug()
 	}
@@ -25,6 +25,35 @@ func Sol1() (ans int) {
 	// game.debug()
 	ans = game.emptyGround()
 	return ans
+}
+
+func Sol2() (ans int) {
+	fmt.Println("Starting Day23 Solution2...")
+	raw := utils.ReadFile("./day23/input.txt")
+	// raw := utils.ReadFile("./day23/example.txt")
+	raw = raw[:len(raw)-1]
+	game := parseRaw(raw)
+	_ = game
+	ans = 1
+	for !game.simulation() {
+		ans++
+		// fmt.Println("round:", i)
+		game.updateDirOrder()
+		// game.debug()
+	}
+	// game.debug()
+	return ans
+}
+
+func landEqual(land1 map[int]map[int]int, land2 map[int]map[int]int) bool {
+	for k,v := range land1 {
+		for k2,v2 := range v {
+			if v2 == 2 && land2[k][k2] != v2 {
+				return false
+			}
+		}
+	}
+	return true
 }
 
 func (g *Game) emptyGround() (ans int) {
@@ -59,13 +88,13 @@ func (g *Game) updateMinMaxXY() {
 	g.minY, g.maxY = minY, maxY
 }
 
-func (g *Game) simulation(round int) {
+func (g *Game) simulation() bool {
 	g.reservedLand = make(map[int]map[int]int)
 	// ReserveLand
 	for i := g.minY; i <= g.maxY; i++ {
 		for j := g.minX; j <= g.maxX; j++ {
 			if g.land[i][j] == 2 {
-				x, y := g.nextLand(round, j, i)
+				x, y := g.nextLand(j, i)
 				g.reserve(x, y)
 			}
 		}
@@ -75,7 +104,7 @@ func (g *Game) simulation(round int) {
 	for i := g.minY; i <= g.maxY; i++ {
 		for j := g.minX; j <= g.maxX; j++ {
 			if g.land[i][j] == 2 {
-				x, y := g.nextLand(round, j, i)
+				x, y := g.nextLand(j, i)
 				if g.reservedLand[y][x] == 3 {
 					newLand[i][j] = 1
 					if newLand[y] == nil {
@@ -90,7 +119,11 @@ func (g *Game) simulation(round int) {
 			}
 		}
 	}
+	if landEqual(g.land, newLand) {
+		return true
+	}
 	g.land = newLand
+	return false
 	// g.debugR()
 	// g.debug()
 }
@@ -122,7 +155,7 @@ func (g *Game) updateDirOrder() {
 	g.directionOrder = append(g.directionOrder[1:], g.directionOrder[0])
 }
 
-func (g *Game) nextLand(round int, x int, y int) (int, int) {
+func (g *Game) nextLand(x int, y int) (int, int) {
 	// check no elf
 	if g.noElf(x, y) {
 		return x, y
