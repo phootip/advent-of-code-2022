@@ -7,7 +7,7 @@ import (
 )
 
 func Sol1() (ans int) {
-	fmt.Println("Starting Day23 Solution1...")
+	fmt.Println("Starting Day24 Solution1...")
 	raw := utils.ReadFile("./day24/input.txt")
 	// raw := utils.ReadFile("./day24/example.txt")
 	raw = raw[:len(raw)-1]
@@ -15,13 +15,28 @@ func Sol1() (ans int) {
 	// game.debug()
 	fmt.Println("generating rounds...")
 	game.saveRound()
-	ans = game.shortestPath()
+	ans = game.shortestPath(Point{1, 0}, Point{game.goal.x, game.goal.y}, 0)
+	return ans
+}
+func Sol2() (ans int) {
+	fmt.Println("Starting Day24 Solution2...")
+	raw := utils.ReadFile("./day24/input.txt")
+	// raw := utils.ReadFile("./day24/example.txt")
+	raw = raw[:len(raw)-1]
+	game := parseRaw(raw)
+	// game.debug()
+	fmt.Println("generating rounds...")
+	game.saveRound()
+	start := Point{1,0}
+	goal := Point{game.goal.x, game.goal.y}
+	ans = game.shortestPath(start, goal, 0)
+	ans = game.shortestPath(goal, start, ans)
+	ans = game.shortestPath(start, goal, ans)
 	return ans
 }
 
-func (g *Game) shortestPath() (ans int) {
-	root := State{Point: Point{x: 1, y: 0}, steps: 0}
-	goal := g.goal
+func (g *Game) shortestPath(start Point, goal Point, step int) (ans int) {
+	root := State{Point: start, steps: step}
 	root.Fscore(g)
 	heap := []State{root}
 	visited := map[State]bool{}
