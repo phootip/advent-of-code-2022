@@ -25,7 +25,6 @@ func Sol2() (ans int) {
 	raw = raw[:len(raw)-1]
 	game := parseRaw(raw)
 	// game.debug()
-	fmt.Println("generating rounds...")
 	game.saveRound()
 	start := Point{1,0}
 	goal := Point{game.goal.x, game.goal.y}
@@ -112,7 +111,7 @@ func (g *Game) saveRound() {
 		}
 		g.rounds = append(g.rounds, points)
 		if i > 0 && g.roundEqual(0, i) {
-			fmt.Println("round equal:", i)
+			// fmt.Println("round equal:", i)
 			g.rounds = g.rounds[:len(g.rounds)-1]
 			return
 		}
